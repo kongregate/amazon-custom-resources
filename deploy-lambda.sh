@@ -6,8 +6,6 @@
 
 set -o errexit
 
-region='eu-west-1'
-
 if [ $# -lt 2 ]
 then
   echo 'Missing required parameters'
@@ -25,7 +23,6 @@ description="Cloud Formation Custom Resource: $func"
 
 role_arn() {
   aws cloudformation describe-stacks \
-    --region $region \
     --stack-name $role_stack_name \
     | jq '.Stacks[0].Outputs[]| select(.OutputKey=="RoleArn")|.OutputValue' \
     | tr -d \"
@@ -38,7 +35,6 @@ zip_package() {
 function_exists() {
   echo "Checking for function $func"
   aws lambda get-function \
-    --region $region \
     --function-name $func > /dev/null 2>&1
 
 }
@@ -48,7 +44,6 @@ create_function() {
   local role_arn=$(role_arn)
   echo "CREATE function $func"
   aws lambda create-function \
-    --region $region \
     --role $role_arn \
     --runtime nodejs \
     --function-name $func  \
@@ -62,7 +57,6 @@ create_function() {
 update_function() {
   echo "UPDATING function $func"
   aws lambda update-function-code \
-    --region $region \
     --function-name $func  \
     --zip-file fileb://$zip
 }

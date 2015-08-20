@@ -1,6 +1,4 @@
 #!/bin/bash
-region='eu-west-1'
-
 if [ $# -lt 3 ]
 then
   echo 'Missing required parameters'
@@ -15,7 +13,6 @@ param="$3"
 
 function_arn() {
   aws lambda get-function-configuration \
-    --region $region \
     --function-name $func \
     | jq '.FunctionArn' \
     | tr -d \"
@@ -26,7 +23,6 @@ payload="$($event_script $func_arn $param)"
 
 aws lambda invoke \
  --function-name $func \
- --region $region \
  --payload "$payload" \
  --log-type Tail \
  context-done.log \
